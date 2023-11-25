@@ -1,13 +1,18 @@
 import * as p5 from 'p5';
+import { Ball } from './Ball';
+import { webMidiInit } from './webMidiInit';
 
 export const sketch = (p: p5) => {
+    let ball = new Ball(100, 100)
+
     p.setup = () => {
-        p.createCanvas(400, 400);
+        p.createCanvas(600, 600);
+        webMidiInit()
     }
 
     p.draw = () => {
         p.background(220);
-        p.ellipse(50,50,80,80);
+        ball.drawLoop(p)
     }
 }
 

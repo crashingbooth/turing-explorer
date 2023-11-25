@@ -2,7 +2,7 @@
   "name": "turing-explorer",
   "version": "1.0.0",
   "description": "",
-  "private":true,
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --open"
@@ -19,6 +19,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
-    "p5": "^1.8.0"
+    "p5": "^1.8.0",
+    "webmidi": "^3.1.6"
   }
 }
