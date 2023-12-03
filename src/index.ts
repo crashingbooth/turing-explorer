@@ -1,18 +1,21 @@
 import * as p5 from 'p5';
-import { Ball } from './Ball';
+import * as M from './Machine';
 import { webMidiInit } from './webMidiInit';
 
 export const sketch = (p: p5) => {
-    let ball = new Ball(100, 100)
+    let grid = M.createNewGrid()
 
     p.setup = () => {
-        p.createCanvas(600, 600);
-        webMidiInit()
+        p.createCanvas(800, 800);
+        grid = M.createNewGrid(72,72,M.weirdLangtonsAntFactory([1,-1,2,-2]))
+        // webMidiInit()
+        p.frameRate(20)
     }
 
     p.draw = () => {
-        p.background(220);
-        ball.drawLoop(p)
+        M.drawGrid(p, grid)
+        grid = M.applyRule(grid)
+
     }
 }
 
