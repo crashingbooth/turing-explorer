@@ -1,5 +1,6 @@
 import { WebMidi } from "webmidi";
 import * as p5 from 'p5';
+import { SoundPlayer } from './sound';
 
 export type State = number
 export type Dir = number
@@ -45,6 +46,8 @@ export interface Grid {
     system: System
     machines: Machine[]
     space: State[][]
+    statePlayer?: SoundPlayer
+    dirPlayer?: SoundPlayer
 }
 
 export const movePoint = (point: Point, dir: Dir): Point => {
@@ -110,7 +113,8 @@ export const createNewGrid = (cols: number = 64, rows: number = 64, rule: Rule =
     const antSystem = { numRows: rows, numCols: cols, numStates: 4, numDirs: 4, rule: rule }
     return {
         system: antSystem,
-        machines: [{ point: { x: Math.floor(rows / 2), y: Math.floor(cols / 2) }, dir: 0 }],
+        // machines: [{ point: { x: Math.floor(rows / 2), y: Math.floor(cols / 2) }, dir: 0 }],
+        machines: [{ point: { x: 2, y: 2 }, dir: 2 }],
         space: createSpace(antSystem)
     }
 }

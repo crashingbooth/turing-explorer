@@ -1,20 +1,23 @@
 import * as p5 from 'p5';
 import * as M from './Machine';
+import { SoundPlayer, articulate, addSoundPlayers } from './sound'; 
 import { webMidiInit } from './webMidiInit';
 
 export const sketch = (p: p5) => {
     let grid = M.createNewGrid()
 
     p.setup = () => {
-        p.createCanvas(800, 800);
-        grid = M.createNewGrid(72,72,M.weirdLangtonsAntFactory([1,-1,2,-2]))
-        // webMidiInit()
-        p.frameRate(20)
+        p.createCanvas(1200, 800);
+        grid = M.createNewGrid(128,64,M.weirdLangtonsAntFactory([1,-1,2,-2]))
+        // grid = addSoundPlayers(grid)
+        webMidiInit()
+        p.frameRate(60)
     }
 
     p.draw = () => {
         M.drawGrid(p, grid)
         grid = M.applyRule(grid)
+        // articulate(grid)
 
     }
 }
