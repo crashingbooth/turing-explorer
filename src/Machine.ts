@@ -1,5 +1,4 @@
 import { WebMidi } from "webmidi";
-import * as p5 from 'p5';
 import { SoundPlayer } from './sound';
 
 export type State = number
@@ -17,7 +16,7 @@ export interface Point {
     y: number
 }
 
-export interface System {
+export interface SystemConfig {
     numRows: number
     numCols: number
     numStates: number
@@ -25,15 +24,30 @@ export interface System {
     rule: Rule
 }
 
+const defaultConfig: SystemConfig = {
+    numRows: 4,
+    numCols: 4,
+    numStates: 4,
+    numDirs: 4,
+    rule: (stateDir) => stateDir
+}
+
 const normalizeSingle = (val: number, max: number): number => {
     let newVal = val < 0 ? max + val : val
     return val >= max ? (val % max) : newVal
 }
 
-export const normalizePoint = (point: Point, system: System): Point => {
+export const normalizePoint = (point: Point, system: SystemConfig): Point => {
     return {
         x: normalizeSingle(point.x, system.numCols),
         y: normalizeSingle(point.y, system.numRows)
+    }
+}
+
+export const normalizeRuleOutput = (stateDir: StateDir, config: SystemConfig) => {
+    return {
+        state: normalizeSingle(stateDir.state, config.numStates),
+        dir: normalizeSingle(stateDir.dir, config.numDirs)
     }
 }
 
@@ -43,7 +57,7 @@ export interface Machine {
 }
 
 export interface Grid {
-    system: System
+    system: SystemConfig
     machines: Machine[]
     space: State[][]
     statePlayer?: SoundPlayer
@@ -68,7 +82,7 @@ export const movePoint = (point: Point, dir: Dir): Point => {
 
 // Rules
 
-const applyDirection = (start: Dir, change: Dir, system: System): Dir => {
+const applyDirection = (start: Dir, change: Dir, system: SystemConfig): Dir => {
     let newRawDir = start + change
     console.log(`start: ${start}, change ${change}: res: ${normalizeSingle(newRawDir, system.numDirs)}`);
 
@@ -81,7 +95,6 @@ export const applyRule = (grid: Grid): Grid => {
     grid.machines.forEach((machine, i) => {
         // move machine in its direction, get new Point
         const newPoint = movePoint(machine.point, machine.dir)
-        // normalize new Point
         const normalizedPoint = normalizePoint(newPoint, grid.system)
         // get new StateDir
         const newStateDir = {
@@ -90,11 +103,12 @@ export const applyRule = (grid: Grid): Grid => {
         }
         // get rule output for new StateDir
         const ruleOutput = grid.system.rule(newStateDir)
+        const normalizedRuleOutput = normalizeRuleOutput(ruleOutput, grid.system)
         // get updated Direction
-        const newDirection = applyDirection(machine.dir, ruleOutput.dir, grid.system)
+        const newDirection = applyDirection(machine.dir, normalizedRuleOutput.dir, grid.system)
 
         // update space
-        grid.space[normalizedPoint.y][normalizedPoint.x] = ruleOutput.state
+        grid.space[normalizedPoint.y][normalizedPoint.x] = normalizedRuleOutput.state
         // update machine
         grid.machines[i] = { point: { ...normalizedPoint }, dir: newDirection }
     })
@@ -102,20 +116,18 @@ export const applyRule = (grid: Grid): Grid => {
     return grid
 }
 
-export const createSpace = (system: System): State[][] => {
+export const createSpace = (system: SystemConfig): State[][] => {
     const space: State[][] = Array.from({ length: system.numRows }, () =>
         Array.from({ length: system.numCols }, () => 0)
     )
     return space
 }
 
-export const createNewGrid = (cols: number = 64, rows: number = 64, rule: Rule = langtonsAntFactory([1,1,-1,-1])) => {
-    const antSystem = { numRows: rows, numCols: cols, numStates: 4, numDirs: 4, rule: rule }
+export const createNewGrid = (config: SystemConfig = defaultConfig) => {
     return {
-        system: antSystem,
-        // machines: [{ point: { x: Math.floor(rows / 2), y: Math.floor(cols / 2) }, dir: 0 }],
-        machines: [{ point: { x: 2, y: 2 }, dir: 2 }],
-        space: createSpace(antSystem)
+        system: config,
+        machines: [{ point: { x: Math.floor(config.numCols / 2), y: Math.floor(config.numRows / 2) }, dir: 0 }],
+        space: createSpace(config)
     }
 }
 
@@ -140,17 +152,17 @@ export const weirdLangtonsAntFactory = (orderedDirs: Dir[]) => {
 
 // other file for drawing
 
-export const drawGrid = (p: p5, grid: Grid) => {
-    p.background(0)
-    p.noStroke()
-    const unit = p.width / grid.system.numCols
-    for (let row = 0; row < grid.system.numRows; row++) {
-        for (let col = 0; col < grid.system.numCols; col++) {
-            const state = grid.space[row][col]
-            p.fill(Math.floor(state/grid.system.numStates * 255))
-            p.circle(col * unit, row * unit, unit)
-        }
-    }
-}
+// export const drawGrid = (p: p5, grid: Grid) => {
+//     p.background(0)
+//     p.noStroke()
+//     const unit = p.width / grid.system.numCols
+//     for (let row = 0; row < grid.system.numRows; row++) {
+//         for (let col = 0; col < grid.system.numCols; col++) {
+//             const state = grid.space[row][col]
+//             p.fill(Math.floor(state/grid.system.numStates * 255))
+//             p.circle(col * unit, row * unit, unit)
+//         }
+//     }
+// }
 
 

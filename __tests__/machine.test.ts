@@ -25,7 +25,7 @@ test('movePoint with dir less than 0', () => {
     expect(Machine.movePoint(p1, -1)).toEqual({x: 0, y:2})
 })
 
-const fourRowsEightsCols: Machine.System = {
+const fourRowsEightsCols: Machine.SystemConfig = {
     numRows: 4,
     numCols: 8, 
     numStates: 4,
@@ -51,6 +51,15 @@ test('normalize left', () => {
 test('normalize right', () => {
     const p1 = {x: 8, y: 0}
     expect(Machine.normalizePoint(p1, fourRowsEightsCols)).toEqual( {x: 0, y: 0 } )
+})
+
+
+test('normalize rule output', () => {
+    const stateDir = {
+        state: 4,
+        dir: 4
+    }
+    expect(Machine.normalizeRuleOutput(stateDir, fourRowsEightsCols)).toEqual({state: 0, dir: 0})
 })
 
 // Apply rule
