@@ -56,18 +56,18 @@ export const addSoundPlayers: (grid: M.Grid) => M.Grid = (grid: M.Grid) => {
         ...grid,
         statePlayer: {
             channel: 1,
-            mapping: [-2, 0, 3, 5, 7, 10],
+            mapping: [0,2,5,7,10],//[0,2,7,10,12,14,3],
             ignoreZero: false,
             rearticulateOnRepeat: false,
-            rootNote: 48,
+            rootNote: 40,
             duration: 200
         },
         dirPlayer: {
             channel: 2,
-            mapping: [0, 1, 2, 3],
+            mapping: [0, 2,5,7,10,15],
             ignoreZero: false,
             rearticulateOnRepeat: false,
-            rootNote: 48,
+            rootNote: 40,
             duration: 200
         }
     }
