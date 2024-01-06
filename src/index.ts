@@ -13,15 +13,15 @@ export const sketch = (p: p5) => {
         drawingConfig = drawing.generateDrawConfig(presets.mySystem)
         p.createCanvas(drawingConfig.canvasX, drawingConfig.canvasY);
         grid = M.createNewGrid(presets.mySystem)
-        // grid = addSoundPlayers(grid)
+        grid = addSoundPlayers(grid)
         webMidiInit()
-        p.frameRate(60)
+        p.frameRate(5)
     }
 
     p.draw = () => {
         drawing.drawGrid(p, grid, drawingConfig)
         grid = M.applyRule(grid)
-        // articulate(grid)
+        articulate(grid)
 
     }
 }

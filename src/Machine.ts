@@ -123,10 +123,10 @@ export const createSpace = (system: SystemConfig): State[][] => {
     return space
 }
 
-export const createNewGrid = (config: SystemConfig = defaultConfig) => {
+export const createNewGrid = (config: SystemConfig = defaultConfig, xOffset: number = 0, yOffset: number = 0) => {
     return {
         system: config,
-        machines: [{ point: { x: Math.floor(config.numCols / 2), y: Math.floor(config.numRows / 2) }, dir: 0 }],
+        machines: [{ point: { x: Math.floor(config.numCols / 2) + xOffset, y: Math.floor(config.numRows / 2) + yOffset }, dir: 0 }],
         space: createSpace(config)
     }
 }

@@ -5,11 +5,17 @@ export interface SoundPlayer {
     channel: number,
     mapping: number[],
     ignoreZero: boolean,
+    rearticulateOnRepeat: boolean,
     rootNote: number,
-    duration: number
+    duration: number,
+    lastInput?: number,
 }
 
 const makeNoise = (inputValue: number, soundPlayer: SoundPlayer) => {
+    if (inputValue === soundPlayer.lastInput && !soundPlayer.rearticulateOnRepeat) {
+        return
+    }
+    soundPlayer.lastInput = inputValue
     if (soundPlayer.ignoreZero) {
         if (inputValue == 0) {
             return
@@ -51,8 +57,9 @@ export const addSoundPlayers: (grid: M.Grid) => M.Grid = (grid: M.Grid) => {
         ...grid,
         statePlayer: {
             channel: 1,
-            mapping: [0, 3, 5, 10, 12, 14, 17, 19],
-            ignoreZero: true,
+            mapping: [-2, 0, 3, 5, 7, 10],
+            ignoreZero: false,
+            rearticulateOnRepeat: false,
             rootNote: 48,
             duration: 200
         },
@@ -60,6 +67,7 @@ export const addSoundPlayers: (grid: M.Grid) => M.Grid = (grid: M.Grid) => {
             channel: 2,
             mapping: [0, 1, 2, 3],
             ignoreZero: false,
+            rearticulateOnRepeat: false,
             rootNote: 48,
             duration: 200
         }
