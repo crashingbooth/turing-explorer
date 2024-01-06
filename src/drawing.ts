@@ -12,9 +12,10 @@ export interface DrawConfig {
 }
 
 export const generateDrawConfig = (systemConfig: Machine.SystemConfig) => {
-    const maximizeHeight = systemConfig.numCols / systemConfig.numRows < maxWidth / maxHeight
+    const heightMultiplier = systemConfig.sides == Machine.Sides.Three ? (Math.sqrt(3)/2) : 1
+    const maximizeHeight = systemConfig.numCols / (systemConfig.numRows * heightMultiplier) < maxWidth / maxHeight
 
-    const unitSize = maximizeHeight ? maxHeight / systemConfig.numRows : maxWidth / systemConfig.numCols
+    const unitSize = maximizeHeight ? maxHeight / (systemConfig.numRows * heightMultiplier) : maxWidth / systemConfig.numCols
 
     return {
         canvasX: unitSize * systemConfig.numCols,
@@ -26,6 +27,15 @@ export const generateDrawConfig = (systemConfig: Machine.SystemConfig) => {
 export const drawGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
     p.background(0)
     p.noStroke()
+
+    if (grid.system.sides === Machine.Sides.Three) {
+        drawTriangularGrid(p, grid, drawConfig)
+    } else {
+        drawSquareGrid(p, grid, drawConfig)
+    }
+}
+
+const drawSquareGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
     for (let row = 0; row < grid.system.numRows; row++) {
         for (let col = 0; col < grid.system.numCols; col++) {
             const state = grid.space[row][col]
@@ -33,4 +43,40 @@ export const drawGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
             p.circle(col * drawConfig.unitSize + drawConfig.unitSize / 2, row * drawConfig.unitSize + drawConfig.unitSize / 2, drawConfig.unitSize)
         }
     }
+}
+
+const drawTriangularGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
+    const triHeight = drawConfig.unitSize * Math.sqrt(3) / 2
+    let unit = drawConfig.unitSize
+    for (let row = 0; row < grid.system.numRows; row++) {
+        for (let col = 0; col < grid.system.numCols; col++) {
+            const state =  grid.space[row][col]
+            const fill = Math.floor(state/grid.system.numStates * 255)
+            const fillCol: [number, number, number] = [fill,fill,fill]
+            let tempFill: [number,number,number] = [0,0,0]
+            if (row % 2 === 0) {
+                if (col % 2 === 0) {
+                    drawDownTriangle(p, fillCol, (col/2) * unit, row * triHeight, unit, triHeight )
+                } else {
+                    drawUpTriangle(p, fillCol, ((col + 1)/2*unit) , row * triHeight, unit, triHeight )
+                }
+            } else {
+                if (col % 2 === 0) {
+                    drawUpTriangle(p, fillCol, unit/2 + ((col/2) * unit) , row * triHeight, unit, triHeight )
+                } else {
+                    drawDownTriangle(p, fillCol, unit/2 + ((col - 1)/2) * unit, row * triHeight, unit, triHeight )
+                }
+            }
+        }
+    }
+}
+
+const drawDownTriangle = (p: p5, fill: [number,number,number], x: number, y: number, unit: number, triHeight: number) => {
+    p.fill(...fill)
+    p.triangle(x,y,  x + unit,y,  x+(unit/2),y+triHeight)
+}
+
+const drawUpTriangle = (p: p5, fill:  [number,number,number], x: number, y: number, unit: number, triHeight: number) => {
+    p.fill(...fill)
+    p.triangle(x,y,   x+(unit/2),y+triHeight,  x-(unit/2),y+triHeight)
 }

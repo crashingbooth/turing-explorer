@@ -4,6 +4,11 @@ import { SoundPlayer } from './sound';
 export type State = number
 export type Dir = number
 
+export enum Sides {
+    Four,
+    Three
+}
+
 export type StateDir = {
     state: State,
     dir: Dir
@@ -21,6 +26,7 @@ export interface SystemConfig {
     numCols: number
     numStates: number
     numDirs: number
+    sides: Sides
     rule: Rule
 }
 
@@ -29,6 +35,7 @@ const defaultConfig: SystemConfig = {
     numCols: 4,
     numStates: 4,
     numDirs: 4,
+    sides: Sides.Four,
     rule: (stateDir) => stateDir
 }
 
@@ -64,9 +71,16 @@ export interface Grid {
     dirPlayer?: SoundPlayer
 }
 
-export const movePoint = (point: Point, dir: Dir): Point => {
-    const normalizedDirection = dir < 0 ? dir += 4 : dir % 4
+export const movePoint = (sides: Sides, point: Point, dir: Dir): Point => {
+    if (sides === Sides.Three) {
+        return movePointFor3(point, dir, 6)
+    } else if (sides === Sides.Four) {
+        return movePointFor4(point, dir, 4)
+    }
+}
 
+const movePointFor4 = (point: Point, dir: Dir, numDirs: number): Point => {
+    const normalizedDirection = dir < 0 ? dir += numDirs : dir % numDirs
     if (normalizedDirection == 0) {
         return { ...point, y: point.y - 1 }
     } else if (normalizedDirection == 1) {
@@ -78,6 +92,30 @@ export const movePoint = (point: Point, dir: Dir): Point => {
     } else {
         return { ...point }
     }
+}
+
+const movePointFor3 = (point: Point, dir: Dir, numDirs: number): Point => {
+    const normalizedDirection = dir < 0 ? dir += numDirs : dir % numDirs
+    const isDown = point.x + point.y % 2 === 0
+    
+
+    if (normalizedDirection == 0) {
+        return { x: point.x, y: point.y - 1}
+    } else if (normalizedDirection == 1) {
+        return { x: point.x + 1, y: point.y }
+    } else if (normalizedDirection == 2) {
+        return { x: point.x + 1, y: point.y }
+    } else if (normalizedDirection == 3) {
+        return { x: point.x , y: point.y + 1}
+    } else if (normalizedDirection == 4) {
+        return { x: point.x - 1, y: point.y }
+    } else if (normalizedDirection == 5) {
+        return { x: point.x - 1, y: point.y }
+    } else {
+        return { ...point }
+    }
+
+
 }
 
 // Rules
@@ -94,7 +132,7 @@ export const applyRule = (grid: Grid): Grid => {
     let newGrid = grid
     grid.machines.forEach((machine, i) => {
         // move machine in its direction, get new Point
-        const newPoint = movePoint(machine.point, machine.dir)
+        const newPoint = movePoint(grid.system.sides, machine.point, machine.dir)
         const normalizedPoint = normalizePoint(newPoint, grid.system)
         // get new StateDir
         const newStateDir = {
@@ -149,20 +187,5 @@ export const weirdLangtonsAntFactory = (orderedDirs: Dir[]) => {
         }
     }
 }
-
-// other file for drawing
-
-// export const drawGrid = (p: p5, grid: Grid) => {
-//     p.background(0)
-//     p.noStroke()
-//     const unit = p.width / grid.system.numCols
-//     for (let row = 0; row < grid.system.numRows; row++) {
-//         for (let col = 0; col < grid.system.numCols; col++) {
-//             const state = grid.space[row][col]
-//             p.fill(Math.floor(state/grid.system.numStates * 255))
-//             p.circle(col * unit, row * unit, unit)
-//         }
-//     }
-// }
 
 

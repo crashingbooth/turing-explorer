@@ -3,26 +3,26 @@ import * as Machine from '../src/Machine';
 
 test('movePoint', () => {
     const p1 = {x: 1, y: 2}
-    expect(Machine.movePoint(p1, 0)).toEqual({x: 1, y:1})
-    expect(Machine.movePoint(p1, 1)).toEqual({x: 2, y:2})
-    expect(Machine.movePoint(p1, 2)).toEqual({x: 1, y:3})
-    expect(Machine.movePoint(p1, 3)).toEqual({x: 0, y:2})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, 0)).toEqual({x: 1, y:1})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, 1)).toEqual({x: 2, y:2})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, 2)).toEqual({x: 1, y:3})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, 3)).toEqual({x: 0, y:2})
 })
 
 test('movePoint with dir higher than 4', () => {
     const p1 = {x: 1, y: 2}
-    expect(Machine.movePoint(p1, 4)).toEqual({x: 1, y:1})
-    expect(Machine.movePoint(p1, 5)).toEqual({x: 2, y:2})
-    expect(Machine.movePoint(p1, 6)).toEqual({x: 1, y:3})
-    expect(Machine.movePoint(p1, 7)).toEqual({x: 0, y:2})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, 4)).toEqual({x: 1, y:1})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, 5)).toEqual({x: 2, y:2})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, 6)).toEqual({x: 1, y:3})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, 7)).toEqual({x: 0, y:2})
 })
 
 test('movePoint with dir less than 0', () => {
     const p1 = {x: 1, y: 2}
-    expect(Machine.movePoint(p1, -4)).toEqual({x: 1, y:1})
-    expect(Machine.movePoint(p1, -3)).toEqual({x: 2, y:2})
-    expect(Machine.movePoint(p1, -2)).toEqual({x: 1, y:3})
-    expect(Machine.movePoint(p1, -1)).toEqual({x: 0, y:2})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, -4)).toEqual({x: 1, y:1})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, -3)).toEqual({x: 2, y:2})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, -2)).toEqual({x: 1, y:3})
+    expect(Machine.movePoint(Machine.Sides.Four,p1, -1)).toEqual({x: 0, y:2})
 })
 
 const fourRowsEightsCols: Machine.SystemConfig = {
@@ -30,6 +30,7 @@ const fourRowsEightsCols: Machine.SystemConfig = {
     numCols: 8, 
     numStates: 4,
     numDirs: 4,
+    sides: Machine.Sides.Four,
     rule: (stateDir: Machine.StateDir) => stateDir // unused here
 }
 
@@ -63,7 +64,7 @@ test('normalize rule output', () => {
 })
 
 // Apply rule
-const fourByFourLangtons = {numRows: 4, numCols: 4, numStates: 2, numDirs: 4, rule: Machine.langtonsAntFactory([1,-1])}
+const fourByFourLangtons = {numRows: 4, numCols: 4, numStates: 2, numDirs: 4, sides: Machine.Sides.Four, rule: Machine.langtonsAntFactory([1,-1])}
 const startingMachine = {point: {x: 1, y:1}, dir: 0}
 
 const createNewGrid: () => Machine.Grid = () => {

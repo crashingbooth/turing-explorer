@@ -10,12 +10,12 @@ export const sketch = (p: p5) => {
     let drawingConfig: drawing.DrawConfig
 
     p.setup = () => {
-        drawingConfig = drawing.generateDrawConfig(presets.mySystem)
+        drawingConfig = drawing.generateDrawConfig(presets.triSystem)
         p.createCanvas(drawingConfig.canvasX, drawingConfig.canvasY);
-        grid = M.createNewGrid(presets.mySystem)
+        grid = M.createNewGrid(presets.triSystem)
         grid = addSoundPlayers(grid)
         webMidiInit()
-        p.frameRate(5)
+        p.frameRate(20)
     }
 
     p.draw = () => {
