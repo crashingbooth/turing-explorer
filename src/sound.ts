@@ -27,7 +27,6 @@ const makeNoise = (inputValue: number, soundPlayer: SoundPlayer) => {
     const octaveSize = Math.floor(soundPlayer.mapping[soundPlayer.mapping.length - 1] / 12) + 1
     const octave = Math.floor(inputValue / soundPlayer.mapping.length)
     const note = soundPlayer.mapping[(inputValue % soundPlayer.mapping.length)] + 12 * octave * octaveSize + soundPlayer.rootNote
-    console.log(`OUTPUTS ${WebMidi}`)
     WebMidi.outputs[0].channels[soundPlayer.channel].playNote(note, { duration: soundPlayer.duration })
 }
 

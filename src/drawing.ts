@@ -5,19 +5,24 @@ import * as p5 from 'p5';
 const maxWidth = 1200
 const maxHeight = 800
 
+export type PColor = [number,number,number]
+export type ColorScheme = Array<PColor>
+
 export interface DrawConfig {
+    colorScheme: ColorScheme,
     canvasX: number,
     canvasY: number
     unitSize: number
 }
 
-export const generateDrawConfig = (systemConfig: Machine.SystemConfig) => {
+export const generateDrawConfig = (systemConfig: Machine.SystemConfig, colorScheme: ColorScheme) => {
     const heightMultiplier = systemConfig.sides == Machine.Sides.Three ? (Math.sqrt(3)/2) : 1
     const maximizeHeight = systemConfig.numCols / (systemConfig.numRows * heightMultiplier) < maxWidth / maxHeight
 
     const unitSize = maximizeHeight ? maxHeight / (systemConfig.numRows * heightMultiplier) : maxWidth / systemConfig.numCols
 
     return {
+        colorScheme: colorScheme,
         canvasX: unitSize * systemConfig.numCols,
         canvasY: unitSize * systemConfig.numRows,
         unitSize: unitSize
@@ -51,8 +56,8 @@ const drawTriangularGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) =
     for (let row = 0; row < grid.system.numRows; row++) {
         for (let col = 0; col < grid.system.numCols; col++) {
             const state =  grid.space[row][col]
-            const fill = Math.floor(state/grid.system.numStates * 255)
-            const fillCol: [number, number, number] = [fill,fill,fill]
+            const fillCol = drawConfig.colorScheme[state % drawConfig.colorScheme.length]// Math.floor(state/grid.system.numStates * 255)
+            // const fillCol: [number, number, number] = [fill,fill,fill]
             let tempFill: [number,number,number] = [0,0,0]
             if (row % 2 === 0) {
                 if (col % 2 === 0) {

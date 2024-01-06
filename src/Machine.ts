@@ -1,5 +1,6 @@
 import { WebMidi } from "webmidi";
 import { SoundPlayer } from './sound';
+import { ColorScheme } from "./drawing";
 
 export type State = number
 export type Dir = number
@@ -27,6 +28,7 @@ export interface SystemConfig {
     numStates: number
     numDirs: number
     sides: Sides
+    colorScheme? : ColorScheme // this shouldn't be in machine. move to presets
     rule: Rule
 }
 
@@ -122,8 +124,6 @@ const movePointFor3 = (point: Point, dir: Dir, numDirs: number): Point => {
 
 const applyDirection = (start: Dir, change: Dir, system: SystemConfig): Dir => {
     let newRawDir = start + change
-    console.log(`start: ${start}, change ${change}: res: ${normalizeSingle(newRawDir, system.numDirs)}`);
-
     return normalizeSingle(newRawDir, system.numDirs)
 }
 
