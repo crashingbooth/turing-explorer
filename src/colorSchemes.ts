@@ -1,6 +1,6 @@
-import * as Drawing from './drawing';
+import  {ColorScheme } from './drawing';
 
-export const scheme1: Drawing.ColorScheme = [
+export const scheme1: ColorScheme = [
     [0, 0, 0],
     [192, 202, 173],
     [157, 169, 160],
@@ -10,13 +10,29 @@ export const scheme1: Drawing.ColorScheme = [
 ]
 
 
-export const scheme2: Drawing.ColorScheme = [
+export const scheme2: ColorScheme = [
     [0, 0, 0],
     [108, 88, 76],
     [157, 169, 160],
     [123, 143, 75],
     [108, 88, 76],
     [221, 229, 182],
-    [173, 193, 120], 
+    [173, 193, 120],
     [221, 229, 182]
 ]
+
+export const blackGreyRed: ColorScheme = [
+    [8, 7, 5],
+    [64, 67, 78],
+    [112, 38, 50],
+    [176, 56, 76],
+]
+
+
+export const blackAndWhite = (numStates: number): ColorScheme => {
+    const interval = 255 / numStates
+    return Array.from({ length: numStates }, (_, index) => {
+        const val = Math.floor(index * interval)
+        return [val, val, val]
+    })
+} 

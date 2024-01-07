@@ -1,5 +1,5 @@
 import * as Machine from './Machine';
-import { scheme2 } from './colorSchemes';
+import { blackAndWhite, scheme2, blackGreyRed } from './colorSchemes';
 import { DrawConfig, generateDrawConfig } from './drawing';
 import { SoundPlayer } from './sound';
 
@@ -72,18 +72,18 @@ export const triSystem2: Machine.SystemConfig = {
 }
 
 export const triSystemPreset = (): Preset => {
-    const drawConfig = generateDrawConfig(triSystem2, scheme2)
+    const drawConfig = generateDrawConfig(triSystem2, blackGreyRed)
     return {
         systemConfig: triSystem2,
         drawConfig: drawConfig,
         machines: drawConfig.defaultMachineStart,
-        bpm: 145,
+        bpm: 140,
         statePlayer: {
             channel: 1,
             mapping: [0, 2, 5, 7, 10],//[0,2,7,10,12,14,3],
             ignoreZero: false,
             rearticulateOnRepeat: false,
-            rootNote: 40,
+            rootNote: 28,
             duration: 200
         },
         dirPlayer: {
