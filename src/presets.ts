@@ -1,4 +1,16 @@
 import * as Machine from './Machine';
+import { scheme2 } from './colorSchemes';
+import { DrawConfig, generateDrawConfig } from './drawing';
+import { SoundPlayer } from './sound';
+
+export interface Preset {
+    systemConfig: Machine.SystemConfig
+    drawConfig: DrawConfig,
+    machines?: [Machine.Machine],
+    bpm: number,
+    statePlayer?: SoundPlayer,
+    dirPlayer?: SoundPlayer
+}
 
 const myRule: Machine.Rule = (stateDir) => {
     const newState = stateDir.state + 1
@@ -7,25 +19,25 @@ const myRule: Machine.Rule = (stateDir) => {
             return {
                 state: newState,
                 dir: (stateDir.state % 2 === 0) ? 1 : -1
-              }
+            }
             break;
         case 1:
             return {
                 state: newState,
-                dir: (stateDir.state % 2 === 0) ? 1 : -1 
-              }
+                dir: (stateDir.state % 2 === 0) ? 1 : -1
+            }
             break;
         case 2:
             return {
                 state: newState,
                 dir: (stateDir.state % 2 === 0) ? 1 : -2
-              }
+            }
             break;
         case 3:
             return {
                 state: newState,
-                dir: (stateDir.state % 2 === 0) ? 1 : -1  
-              }
+                dir: (stateDir.state % 2 === 0) ? 1 : -1
+            }
             break;
     }
 }
@@ -47,15 +59,40 @@ export const triSystem: Machine.SystemConfig = {
     numRows: 24,
     numStates: 8,
     sides: Machine.Sides.Three,
-    rule: Machine.langtonsAntFactory([-1,-1,1,1,-1,-1,1,1])
+    rule: Machine.langtonsAntFactory([-1, -1, 1, 1, -1, -1, 1, 1])
 }
 
 export const triSystem2: Machine.SystemConfig = {
     numDirs: 6,
-    numCols: 48,
-    numRows: 16,
+    numCols: 36,
+    numRows: 12,
     numStates: 4,
     sides: Machine.Sides.Three,
-    rule: Machine.langtonsAntFactory([1,3,3,-1]) // loops
-    // rule: Machine.langtonsAntFactory([-1,1,-3,3]) // loops
+    rule: Machine.langtonsAntFactory([1, 3, 3, -1])
+}
+
+export const triSystemPreset = (): Preset => {
+    const drawConfig = generateDrawConfig(triSystem2, scheme2)
+    return {
+        systemConfig: triSystem2,
+        drawConfig: drawConfig,
+        machines: drawConfig.defaultMachineStart,
+        bpm: 145,
+        statePlayer: {
+            channel: 1,
+            mapping: [0, 2, 5, 7, 10],//[0,2,7,10,12,14,3],
+            ignoreZero: false,
+            rearticulateOnRepeat: false,
+            rootNote: 40,
+            duration: 200
+        },
+        dirPlayer: {
+            channel: 2,
+            mapping: [0, 2, 3, 5, 7, 10],
+            ignoreZero: false,
+            rearticulateOnRepeat: false,
+            rootNote: 64,
+            duration: 200
+        },
+    }
 }

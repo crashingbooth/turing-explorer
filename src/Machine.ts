@@ -1,6 +1,7 @@
 import { WebMidi } from "webmidi";
 import { SoundPlayer } from './sound';
 import { ColorScheme } from "./drawing";
+import { Preset } from "./presets";
 
 export type State = number
 export type Dir = number
@@ -161,12 +162,12 @@ export const createSpace = (system: SystemConfig): State[][] => {
     return space
 }
 
-export const createNewGrid = (config: SystemConfig = defaultConfig, machines: [Machine]) => {
+export const createNewGrid = (preset: Preset) => {
 
     return {
-        system: config,
-        machines: machines,
-        space: createSpace(config)
+        system: preset.systemConfig,
+        machines: preset.machines,
+        space: createSpace(preset.systemConfig)
     }
 }
 

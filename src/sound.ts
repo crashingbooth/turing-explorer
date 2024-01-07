@@ -1,5 +1,7 @@
-import * as M from './Machine';
+import { Grid, Machine } from './Machine';
 import { WebMidi } from "webmidi";
+import { Preset }  from './presets'
+
 
 export interface SoundPlayer {
     channel: number,
@@ -30,16 +32,16 @@ const makeNoise = (inputValue: number, soundPlayer: SoundPlayer) => {
     WebMidi.outputs[0].channels[soundPlayer.channel].playNote(note, { duration: soundPlayer.duration })
 }
 
-const articulateState = (grid: M.Grid, machine: M.Machine) => {
+const articulateState = (grid: Grid, machine: Machine) => {
     const state = grid.space[machine.point.y][machine.point.x]
     makeNoise(state, grid.statePlayer)
 }
 
-const articulateDir = (grid: M.Grid, machine: M.Machine) => {
+const articulateDir = (grid: Grid, machine: Machine) => {
     makeNoise(machine.dir, grid.dirPlayer)
 }
 
-export const articulate = (grid: M.Grid) => {
+export const articulate = (grid: Grid) => {
     for (let machine of grid.machines) {
         if (grid.statePlayer) {
             articulateState(grid, machine)
@@ -51,7 +53,12 @@ export const articulate = (grid: M.Grid) => {
     }
 }
 
-export const addSoundPlayers: (grid: M.Grid) => M.Grid = (grid: M.Grid) => {
+export const bpmToFrameRate = (bpm: number): number => {
+    // assume four events per beat
+    return bpm * 4 / 60
+}
+
+export const addSoundPlayers = (grid: Grid): Grid => {
     return {
         ...grid,
         statePlayer: {
@@ -71,5 +78,12 @@ export const addSoundPlayers: (grid: M.Grid) => M.Grid = (grid: M.Grid) => {
             duration: 200
         }
     }
+}
+
+export const addSoundPlayersFromPreset = (grid: Grid, preset: Preset): Grid => {
+    return { ...grid,
+        statePlayer: preset.statePlayer,
+        dirPlayer: preset.dirPlayer
+    } 
 }
 

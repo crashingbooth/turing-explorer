@@ -2,8 +2,8 @@ import * as Machine from './Machine';
 import * as p5 from 'p5';
 
 
-const maxWidth = 1200
-const maxHeight = 800
+const maxWidth = 1920 * 1.2// 1200
+const maxHeight = 1080 * 1.2 // 800
 
 const triangleHeight = (Math.sqrt(3)/2)
 
@@ -31,27 +31,28 @@ export const generateDrawConfig = (systemConfig: Machine.SystemConfig, colorSche
 
     return {
         colorScheme: colorScheme,
-        canvasX: unitSize * systemConfig.numCols/2,
-        canvasY: unitSize * systemConfig.numRows,
+        canvasX: unitSize * systemConfig.numCols,
+        canvasY: yUnitSize * systemConfig.numRows,
         unitSize: unitSize,
         defaultMachineStart: getDefaultMachineStartPoint(systemConfig)
     }
 }
 
 const getUnitSizeForFour =  (systemConfig: Machine.SystemConfig) => {
-    const factoredWidth = systemConfig.numCols / 2
-    const factoredHeight = systemConfig.numRows * triangleHeight
 
-    const maximizeHeight = factoredWidth / factoredHeight < maxWidth / maxHeight
-    const unitSize = maximizeHeight ? maxHeight / factoredHeight : maxWidth / factoredWidth
+    const maximizeHeight = systemConfig.numCols / systemConfig.numRows < maxWidth / maxHeight
+    const unitSize = maximizeHeight ? maxHeight / systemConfig.numRows : maxWidth / systemConfig.numCols
 
     return unitSize
 }
 
 const getUnitSizeForThree =  (systemConfig: Machine.SystemConfig) => {
-    const maximizeHeight =  true //systemConfig.numCols / systemConfig.numRows < maxWidth / maxHeight
-    const unitSize = maximizeHeight ? maxHeight / systemConfig.numRows : maxWidth / systemConfig.numCols
+    const factoredWidth = systemConfig.numCols / 2
+    const factoredHeight = systemConfig.numRows * triangleHeight
 
+    const maximizeHeight =  factoredWidth / factoredHeight < maxWidth / maxHeight
+    const unitSize = maximizeHeight ? maxHeight / factoredHeight : maxWidth / factoredWidth
+    
     return unitSize
 }
 
