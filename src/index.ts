@@ -7,13 +7,13 @@ import { SoundPlayer, articulate, addSoundPlayers } from './sound';
 import { webMidiInit } from './webMidiInit';
 
 export const sketch = (p: p5) => {
-    let grid = M.createNewGrid()
+    let grid: M.Grid
     let drawingConfig: drawing.DrawConfig
 
     p.setup = () => {
-        drawingConfig = drawing.generateDrawConfig(presets.triSystem2, colorSchemes.scheme2 )
+        drawingConfig = drawing.generateDrawConfig(presets.triSystem2, colorSchemes.scheme1 )
         p.createCanvas(drawingConfig.canvasX, drawingConfig.canvasY);
-        grid = M.createNewGrid(presets.triSystem2)
+        grid = M.createNewGrid(presets.triSystem2, drawingConfig.defaultMachineStart)
         grid = addSoundPlayers(grid)
         webMidiInit()
         p.frameRate(10)

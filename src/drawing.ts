@@ -5,29 +5,61 @@ import * as p5 from 'p5';
 const maxWidth = 1200
 const maxHeight = 800
 
+const triangleHeight = (Math.sqrt(3)/2)
+
 export type PColor = [number,number,number]
 export type ColorScheme = Array<PColor>
 
 export interface DrawConfig {
     colorScheme: ColorScheme,
     canvasX: number,
-    canvasY: number
-    unitSize: number
+    canvasY: number,
+    unitSize: number,
+    defaultMachineStart?: [Machine.Machine] // if no machines are included in the preset, start with one in centre
 }
 
-export const generateDrawConfig = (systemConfig: Machine.SystemConfig, colorScheme: ColorScheme) => {
-    const heightMultiplier = systemConfig.sides == Machine.Sides.Three ? (Math.sqrt(3)/2) : 1
-    const maximizeHeight = systemConfig.numCols / (systemConfig.numRows * heightMultiplier) < maxWidth / maxHeight
-
-    const unitSize = maximizeHeight ? maxHeight / (systemConfig.numRows * heightMultiplier) : maxWidth / systemConfig.numCols
+// drawConfig
+export const generateDrawConfig = (systemConfig: Machine.SystemConfig, colorScheme: ColorScheme): DrawConfig => {
+    
+    let unitSize: number
+    if (systemConfig.sides === Machine.Sides.Four) {
+        unitSize = getUnitSizeForFour(systemConfig)
+    } else if (systemConfig.sides === Machine.Sides.Three) {
+        unitSize = getUnitSizeForThree(systemConfig)
+    }
+    let yUnitSize = systemConfig.sides === Machine.Sides.Three ? unitSize * triangleHeight : unitSize
 
     return {
         colorScheme: colorScheme,
-        canvasX: unitSize * systemConfig.numCols,
+        canvasX: unitSize * systemConfig.numCols/2,
         canvasY: unitSize * systemConfig.numRows,
-        unitSize: unitSize
+        unitSize: unitSize,
+        defaultMachineStart: getDefaultMachineStartPoint(systemConfig)
     }
 }
+
+const getUnitSizeForFour =  (systemConfig: Machine.SystemConfig) => {
+    const factoredWidth = systemConfig.numCols / 2
+    const factoredHeight = systemConfig.numRows * triangleHeight
+
+    const maximizeHeight = factoredWidth / factoredHeight < maxWidth / maxHeight
+    const unitSize = maximizeHeight ? maxHeight / factoredHeight : maxWidth / factoredWidth
+
+    return unitSize
+}
+
+const getUnitSizeForThree =  (systemConfig: Machine.SystemConfig) => {
+    const maximizeHeight =  true //systemConfig.numCols / systemConfig.numRows < maxWidth / maxHeight
+    const unitSize = maximizeHeight ? maxHeight / systemConfig.numRows : maxWidth / systemConfig.numCols
+
+    return unitSize
+}
+
+const getDefaultMachineStartPoint = (systemConfig: Machine.SystemConfig): [Machine.Machine] => {
+    return [{point: { x: Math.floor(systemConfig.numCols / 2), y: Math.floor(systemConfig.numRows / 2)}, dir :0}]
+}
+
+/// DRAWING
 
 export const drawGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
     p.background(0)
@@ -56,32 +88,30 @@ const drawTriangularGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) =
     for (let row = 0; row < grid.system.numRows; row++) {
         for (let col = 0; col < grid.system.numCols; col++) {
             const state =  grid.space[row][col]
-            const fillCol = drawConfig.colorScheme[state % drawConfig.colorScheme.length]// Math.floor(state/grid.system.numStates * 255)
-            // const fillCol: [number, number, number] = [fill,fill,fill]
-            let tempFill: [number,number,number] = [0,0,0]
+            p.fill(...drawConfig.colorScheme[state % drawConfig.colorScheme.length])
+
+            const startOffset = unit/2
             if (row % 2 === 0) {
                 if (col % 2 === 0) {
-                    drawDownTriangle(p, fillCol, (col/2) * unit, row * triHeight, unit, triHeight )
+                    drawDownTriangle(p, (col/2) * unit, row * triHeight, unit, triHeight)
                 } else {
-                    drawUpTriangle(p, fillCol, ((col + 1)/2*unit) , row * triHeight, unit, triHeight )
+                    drawUpTriangle(p, (col + 1)/2 * unit , row * triHeight, unit, triHeight)
                 }
             } else {
                 if (col % 2 === 0) {
-                    drawUpTriangle(p, fillCol, unit/2 + ((col/2) * unit) , row * triHeight, unit, triHeight )
+                    drawUpTriangle(p, startOffset + (col/2) * unit , row * triHeight, unit, triHeight)
                 } else {
-                    drawDownTriangle(p, fillCol, unit/2 + ((col - 1)/2) * unit, row * triHeight, unit, triHeight )
+                    drawDownTriangle(p, startOffset + ((col - 1)/2) * unit, row * triHeight, unit, triHeight)
                 }
             }
         }
     }
 }
 
-const drawDownTriangle = (p: p5, fill: [number,number,number], x: number, y: number, unit: number, triHeight: number) => {
-    p.fill(...fill)
+const drawDownTriangle = (p: p5, x: number, y: number, unit: number, triHeight: number) => {
     p.triangle(x,y,  x + unit,y,  x+(unit/2),y+triHeight)
 }
 
-const drawUpTriangle = (p: p5, fill:  [number,number,number], x: number, y: number, unit: number, triHeight: number) => {
-    p.fill(...fill)
+const drawUpTriangle = (p: p5, x: number, y: number, unit: number, triHeight: number) => {
     p.triangle(x,y,   x+(unit/2),y+triHeight,  x-(unit/2),y+triHeight)
 }

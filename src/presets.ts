@@ -52,8 +52,8 @@ export const triSystem: Machine.SystemConfig = {
 
 export const triSystem2: Machine.SystemConfig = {
     numDirs: 6,
-    numCols: 32,
-    numRows: 24,
+    numCols: 48,
+    numRows: 16,
     numStates: 4,
     sides: Machine.Sides.Three,
     rule: Machine.langtonsAntFactory([1,3,3,-1]) // loops

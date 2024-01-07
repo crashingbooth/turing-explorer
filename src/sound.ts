@@ -64,10 +64,10 @@ export const addSoundPlayers: (grid: M.Grid) => M.Grid = (grid: M.Grid) => {
         },
         dirPlayer: {
             channel: 2,
-            mapping: [0, 2,5,7,10,15],
+            mapping: [0,2,3,5,7,10],
             ignoreZero: false,
             rearticulateOnRepeat: false,
-            rootNote: 40,
+            rootNote: 64,
             duration: 200
         }
     }
