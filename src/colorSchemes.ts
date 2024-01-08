@@ -25,7 +25,7 @@ export const blackGreyRed: ColorScheme = [
     [8, 7, 5],
     [64, 67, 78],
     [112, 38, 50],
-    [176, 56, 76],
+    [166, 117, 71],
 ]
 
 
