@@ -28,6 +28,15 @@ export const blackGreyRed: ColorScheme = [
     [166, 117, 71],
 ]
 
+export const redToBrown: ColorScheme = [
+    [0,10,0],
+    [120, 1, 22],
+    [247, 181, 56],
+    [219, 124, 38],
+    [216, 87, 42],
+    [195, 47, 39],
+]
+
 
 export const blackAndWhite = (numStates: number): ColorScheme => {
     const interval = 255 / numStates

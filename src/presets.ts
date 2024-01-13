@@ -1,5 +1,5 @@
 import * as Machine from './Machine';
-import { blackAndWhite, scheme2, blackGreyRed } from './colorSchemes';
+import { blackAndWhite, scheme2, blackGreyRed, redToBrown } from './colorSchemes';
 import { DrawConfig, generateDrawConfig } from './drawing';
 import { SoundPlayer } from './sound';
 
@@ -104,8 +104,8 @@ export const triSystemPreset = (): Preset => {
 export const triangleLangton = (numRepeats: number, rule: number[]):Machine.SystemConfig => { 
     return {
     numDirs: 6,
-    numCols: 36,
-    numRows: 24,
+    numCols: 48,
+    numRows: 28,
     numStates: 2 * numRepeats,
     sides: Machine.Sides.Three,
     rule: Machine.langtonsAntFactory(
@@ -121,7 +121,7 @@ const run = (n: number): number[] => {
 const nameOrderedScale = [0,7,10,12,14,3]
 
 export const triangleLangtonPreset = (generator:  Machine.SystemConfig): Preset => {
-    const drawConfig = generateDrawConfig(generator, blackAndWhite(generator.numStates))
+    const drawConfig = generateDrawConfig(generator, blackAndWhite(generator.numStates + 2), 100, 500)
     return {
         systemConfig: generator,
         drawConfig: drawConfig,

@@ -1,9 +1,9 @@
 import * as Machine from './Machine';
 import * as p5 from 'p5';
 
-
-const maxWidth = 1920 * 1.2// 1200
-const maxHeight = 1080 * 1.2 // 800
+const mult = 1.2
+const maxWidth = 1920 * mult * mult// 1200
+const maxHeight = 1080 * mult // 800
 
 const triangleHeight = (Math.sqrt(3)/2)
 
@@ -69,8 +69,8 @@ const getDefaultMachineStartPoint = (systemConfig: Machine.SystemConfig): [Machi
 export const drawGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
     p.background(drawConfig.colorScheme[0])
     // p.noStroke()
-    p.stroke(drawConfig.colorScheme[0])
-    p.strokeWeight(1)
+    // p.stroke(drawConfig.colorScheme[0])
+    p.strokeWeight(0.3)
 
     if (grid.system.sides === Machine.Sides.Three) {
         drawTriangularGrid(p, grid, drawConfig)
@@ -115,14 +115,24 @@ const drawTriangularGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) =
     }
 }
 
+const isSwapping: boolean = true
+const drawTriangle = (p: p5, [x1, y1, x2,y2,x3,y3]: [number, number,number, number, number, number]) => {
+    const args: [number, number,number, number, number, number] = isSwapping ? [y1,x1,y2,x2,y3,x3] : [x1, y1, x2,y2,x3,y3]
+    p.triangle(...args)
+}
+
 const drawDownTriangle = (p: p5, x: number, y: number, unit: number, triHeight: number, drawConfig: DrawConfig) => {
     x = x + drawConfig.globalXOffset
     y = y + drawConfig.globalYOffset
-    p.triangle(x,y,  x + unit,y,  x+(unit/2),y+triHeight)
+    drawTriangle(p,[x,y,  x + unit,y,  x+(unit/2),y+triHeight])
 }
 
 const drawUpTriangle = (p: p5, x: number, y: number, unit: number, triHeight: number, drawConfig: DrawConfig) => {
     x = x + drawConfig.globalXOffset
     y = y + drawConfig.globalYOffset
-    p.triangle(x,y,   x+(unit/2),y+triHeight,  x-(unit/2),y+triHeight)
+    drawTriangle(p,[x,y,   x+(unit/2),y+triHeight,  x-(unit/2),y+triHeight])
 }
+
+
+
+

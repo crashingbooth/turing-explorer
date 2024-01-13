@@ -7,7 +7,7 @@ import { SoundPlayer, articulate, addSoundPlayers, addSoundPlayersFromPreset, bp
 import { webMidiInit } from './webMidiInit';
 
 export const sketch = (p: p5) => {
-    const delay = 0
+    const delay = 150
     let grid: M.Grid
     let frame = 0
     let drawingConfig: drawing.DrawConfig
