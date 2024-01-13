@@ -11,9 +11,10 @@ export interface SoundPlayer {
     rootNote: number,
     duration: number,
     lastInput?: number,
+    debugToConsole?: boolean
 }
 
-const makeNoise = (inputValue: number, soundPlayer: SoundPlayer) => {
+const makeNoise = (inputValue: number, soundPlayer: SoundPlayer, name: string) => {
     if (inputValue === soundPlayer.lastInput && !soundPlayer.rearticulateOnRepeat) {
         return
     }
@@ -30,15 +31,23 @@ const makeNoise = (inputValue: number, soundPlayer: SoundPlayer) => {
     const octave = Math.floor(inputValue / soundPlayer.mapping.length)
     const note = soundPlayer.mapping[(inputValue % soundPlayer.mapping.length)] + 12 * octave * octaveSize + soundPlayer.rootNote
     WebMidi.outputs[0].channels[soundPlayer.channel].playNote(note, { duration: soundPlayer.duration })
+
+    if (soundPlayer.debugToConsole ?? false) {
+        console.log(`${name} - ch: ${soundPlayer.channel}, note: ${note} (input: ${inputValue})`)
+    }
 }
 
 const articulateState = (grid: Grid, machine: Machine) => {
     const state = grid.space[machine.point.y][machine.point.x]
-    makeNoise(state, grid.statePlayer)
+    makeNoise(state, grid.statePlayer, "statePlayer")
 }
 
 const articulateDir = (grid: Grid, machine: Machine) => {
-    makeNoise(machine.dir, grid.dirPlayer)
+    makeNoise(machine.dir, grid.dirPlayer, "dirPlayer")
+}
+
+const articulateChange = (grid: Grid, machine: Machine) => {
+    makeNoise(machine.lastChange, grid.changePlayer, "changePlayer")
 }
 
 export const articulate = (grid: Grid) => {
@@ -50,6 +59,10 @@ export const articulate = (grid: Grid) => {
         if (grid.dirPlayer) {
             articulateDir(grid, machine)
         }
+
+        if (grid.changePlayer) {
+            articulateChange(grid, machine)
+        }
     }
 }
 
@@ -58,32 +71,11 @@ export const bpmToFrameRate = (bpm: number): number => {
     return bpm * 4 / 60
 }
 
-export const addSoundPlayers = (grid: Grid): Grid => {
-    return {
-        ...grid,
-        statePlayer: {
-            channel: 1,
-            mapping: [0,2,5,7,10],//[0,2,7,10,12,14,3],
-            ignoreZero: false,
-            rearticulateOnRepeat: false,
-            rootNote: 40,
-            duration: 200
-        },
-        dirPlayer: {
-            channel: 2,
-            mapping: [0,2,3,5,7,10],
-            ignoreZero: false,
-            rearticulateOnRepeat: false,
-            rootNote: 64,
-            duration: 200
-        }
-    }
-}
-
 export const addSoundPlayersFromPreset = (grid: Grid, preset: Preset): Grid => {
     return { ...grid,
         statePlayer: preset.statePlayer,
-        dirPlayer: preset.dirPlayer
+        dirPlayer: preset.dirPlayer,
+        changePlayer: preset.changePlayer
     } 
 }
 

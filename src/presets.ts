@@ -9,7 +9,8 @@ export interface Preset {
     machines?: [Machine.Machine],
     bpm: number,
     statePlayer?: SoundPlayer,
-    dirPlayer?: SoundPlayer
+    dirPlayer?: SoundPlayer,
+    changePlayer?: SoundPlayer
 }
 
 const myRule: Machine.Rule = (stateDir) => {
@@ -114,13 +115,15 @@ export const triangleLangton = (numRepeats: number, rule: number[]):Machine.Syst
 }
 }
 
+/// like the `run` function in TidalCycles
+/// run(4) => [0,1,2,3]
 const run = (n: number): number[] => {
-    return Array.from({ length: n }, (_, index) => index)
+    return Array.from({ length: n }, (_, i) => i)
 }
 
 const nameOrderedScale = [0,7,10,12,14,3]
 
-export const triangleLangtonPreset = (generator:  Machine.SystemConfig): Preset => {
+export const triangleLangtonPreset1 = (generator:  Machine.SystemConfig): Preset => {
     const drawConfig = generateDrawConfig(generator, blackAndWhite(generator.numStates + 2), 100, 500)
     return {
         systemConfig: generator,
@@ -129,15 +132,15 @@ export const triangleLangtonPreset = (generator:  Machine.SystemConfig): Preset 
         bpm: 120,
         statePlayer: {
             channel: 1,
-            mapping: nameOrderedScale,//[0,2,7,10,12,14,3],
+            mapping: nameOrderedScale,
             ignoreZero: true,
             rearticulateOnRepeat: false,
             rootNote: 40,
-            duration: 150
+            duration: 150,
         },
         dirPlayer: {
             channel: 2,
-            mapping: nameOrderedScale,//nameOrderedScale,//[0, 2, 3, 5, 7, 10],
+            mapping: nameOrderedScale,
             ignoreZero: false,
             rearticulateOnRepeat: true,
             rootNote: 52,
@@ -146,5 +149,44 @@ export const triangleLangtonPreset = (generator:  Machine.SystemConfig): Preset 
     }
 }
 
-export const triangleLangtonBasic = triangleLangtonPreset(triangleLangton(3, [-1,1]))
+export const triangleLangtonBasic = triangleLangtonPreset1(triangleLangton(3, [-1,1]))
+
+// triange langton variants
+
+export const triangleLangtonPreset2 = (generator:  Machine.SystemConfig): Preset => {
+    const drawConfig = generateDrawConfig(generator, blackAndWhite(generator.numStates + 2), 100, 500)
+    return {
+        systemConfig: generator,
+        drawConfig: drawConfig,
+        machines: drawConfig.defaultMachineStart,
+        bpm: 120,
+        statePlayer: {
+            channel: 1,
+            mapping: nameOrderedScale,
+            ignoreZero: true,
+            rearticulateOnRepeat: false,
+            rootNote: 40,
+            duration: 150
+        },
+        dirPlayer: {
+            channel: 2,
+            mapping: nameOrderedScale,
+            ignoreZero: false,
+            rearticulateOnRepeat: true,
+            rootNote: 52,
+            duration: 200
+        },
+        changePlayer: {
+            channel: 3,
+            mapping: run(6),
+            ignoreZero: false,
+            rearticulateOnRepeat: true,
+            rootNote: 52,
+            duration: 150,
+            debugToConsole: true
+        }
+    }
+}
+
+export const triangleLangtonSymmetrical = triangleLangtonPreset2(triangleLangton(1, [-1,1,1,-1]))
 

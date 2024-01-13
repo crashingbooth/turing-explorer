@@ -64,6 +64,7 @@ export const normalizeRuleOutput = (stateDir: StateDir, config: SystemConfig) =>
 export interface Machine {
     point: Point
     dir: Dir
+    lastChange?: Dir 
 }
 
 export interface Grid {
@@ -72,6 +73,7 @@ export interface Grid {
     space: State[][]
     statePlayer?: SoundPlayer
     dirPlayer?: SoundPlayer
+    changePlayer?: SoundPlayer
 }
 
 export const movePoint = (sides: Sides, point: Point, dir: Dir): Point => {
@@ -149,7 +151,7 @@ export const applyRule = (grid: Grid): Grid => {
         // update space
         grid.space[normalizedPoint.y][normalizedPoint.x] = normalizedRuleOutput.state
         // update machine
-        grid.machines[i] = { point: { ...normalizedPoint }, dir: newDirection }
+        grid.machines[i] = { point: { ...normalizedPoint }, dir: newDirection, lastChange: normalizeSingle(ruleOutput.dir, grid.system.numDirs) }
     })
 
     return grid
