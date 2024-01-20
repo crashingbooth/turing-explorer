@@ -1,11 +1,13 @@
 import * as Machine from './Machine';
 import * as p5 from 'p5';
 
-const mult = 1.2
+const mult = 0.8
 const maxWidth = 1920 * mult * mult// 1200
 const maxHeight = 1080 * mult // 800
 
 const triangleHeight = (Math.sqrt(3)/2)
+const hexExtraWidthFactor = Math.sin(2 * Math.PI/6) // 1 col = unit + 2 * hexExtraWidthFactor(unit)
+const hexExtraHeightFactor = Math.cos(2 * Math.PI/6) // 1 row = 2 * hexExtraWidthFactor(unit)
 
 export type PColor = [number,number,number]
 export type ColorScheme = Array<PColor>
@@ -28,13 +30,28 @@ export const generateDrawConfig = (systemConfig: Machine.SystemConfig, colorSche
         unitSize = getUnitSizeForFour(systemConfig)
     } else if (systemConfig.sides === Machine.Sides.Three) {
         unitSize = getUnitSizeForThree(systemConfig)
+    } else if (systemConfig.sides === Machine.Sides.Six) {
+        unitSize = getUnitSizeForSix(systemConfig) // TODO: define for SIX
     }
+
     let yUnitSize = systemConfig.sides === Machine.Sides.Three ? unitSize * triangleHeight : unitSize
+
+    let canvasSize: [number, number] 
+    if (systemConfig.sides === Machine.Sides.Four) {
+        canvasSize = [systemConfig.numCols * unitSize, systemConfig.numRows * unitSize]
+    } else if (systemConfig.sides === Machine.Sides.Three) {
+        canvasSize = [systemConfig.numCols * unitSize, systemConfig.numRows * yUnitSize]
+    } else if (systemConfig.sides === Machine.Sides.Six) {
+        canvasSize = [systemConfig.numCols * unitSize * 2, systemConfig.numRows * unitSize * triangleHeight * 2]
+    }
+
+
+   
 
     return {
         colorScheme: colorScheme,
-        canvasX: unitSize * systemConfig.numCols,
-        canvasY: yUnitSize * systemConfig.numRows,
+        canvasX: canvasSize[0],
+        canvasY: canvasSize[1],
         unitSize: unitSize,
         globalXOffset: xOffset,
         globalYOffset: yOffset,
@@ -60,6 +77,26 @@ const getUnitSizeForThree =  (systemConfig: Machine.SystemConfig) => {
     return unitSize
 }
 
+const getUnitSizeForSix = (systemConfig: Machine.SystemConfig) => {
+    // const offsetYFactor = Math.sin(Math.PI/6)
+	// const offsetXFactor = Math.cos(Math.PI/6) 
+
+    // // const maximizeHeight = (systemConfig.numCols * offsetXFactor) / (systemConfig.numRows * offsetYFactor) < maxWidth / maxHeight
+    // const maximizeHeight = false
+    // const unitSize = maximizeHeight ? maxHeight / (systemConfig.numRows * offsetYFactor): maxWidth / (systemConfig.numCols * offsetXFactor)
+
+    return getUnitSizeForSixByHeight(systemConfig)
+}
+
+const getUnitSizeForSixByWidth = (systemConfig: Machine.SystemConfig) => {
+    return maxWidth / (systemConfig.numCols * 2)
+}
+
+const getUnitSizeForSixByHeight = (systemConfig: Machine.SystemConfig) => {
+    return maxHeight/ (systemConfig.numRows * Math.sqrt(3))
+}
+
+
 const getDefaultMachineStartPoint = (systemConfig: Machine.SystemConfig): [Machine.Machine] => {
     return [{point: { x: Math.floor(systemConfig.numCols / 2), y: Math.floor(systemConfig.numRows / 2)}, dir :0}]
 }
@@ -74,8 +111,10 @@ export const drawGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
 
     if (grid.system.sides === Machine.Sides.Three) {
         drawTriangularGrid(p, grid, drawConfig)
-    } else {
+    } else if (grid.system.sides === Machine.Sides.Four) {
         drawSquareGrid(p, grid, drawConfig)
+    } else if ((grid.system.sides === Machine.Sides.Six)) {
+        drawHexagonalGrid(p, grid, drawConfig)
     }
 }
 
@@ -87,6 +126,32 @@ const drawSquareGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
             p.circle(col * drawConfig.unitSize + drawConfig.unitSize / 2 + drawConfig.globalXOffset, row * drawConfig.unitSize + drawConfig.unitSize / 2 + drawConfig.globalYOffset, drawConfig.unitSize)
         }
     }
+}
+
+const drawHexagonalGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
+    const offsetY = Math.sin(p.radians(60)) * drawConfig.unitSize;
+	const offsetX = Math.cos(p.radians(60)) * drawConfig.unitSize;
+    const unit = drawConfig.unitSize
+    
+    for (let row = 0; row < grid.system.numRows; row++) {
+        for (let col = 0; col < grid.system.numCols; col++) {
+            const state = grid.space[row][col]
+            p.fill(...drawConfig.colorScheme[state % drawConfig.colorScheme.length])
+            const yOff = col % 2 == 0 ? 0 : offsetY;
+            makeHexagonalCell(p, col * (drawConfig.unitSize + offsetX), row * (offsetY * 2) + yOff, unit, offsetX, offsetY)
+        }
+    }
+}
+
+const makeHexagonalCell = (p: p5, x: number, y: number, unit: number, xOffset: number, yOffset: number) => {
+    p.beginShape()
+    p.vertex(x,y)
+    p.vertex(x + unit, y)
+    p.vertex(x + unit + xOffset, y + yOffset);
+	p.vertex(x + unit, y + yOffset * 2);
+	p.vertex(x, y + yOffset * 2);
+	p.vertex(x - xOffset, y + yOffset)
+	p.endShape(p.CLOSE);
 }
 
 const drawTriangularGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
