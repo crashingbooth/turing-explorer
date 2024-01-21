@@ -198,8 +198,8 @@ export const triangleLangtonSymmetrical = triangleLangtonPreset2(triangleLangton
 export const hexagonalLangton = (numRepeats: number, rule: number[]): Machine.SystemConfig => {
     return {
         numDirs: 6,
-        numCols: 32,
-        numRows: 24,
+        numCols: 56,
+        numRows: 48,
         numStates: rule.length * numRepeats,
         sides: Machine.Sides.Six,
         rule: Machine.langtonsAntFactory(
@@ -208,24 +208,26 @@ export const hexagonalLangton = (numRepeats: number, rule: number[]): Machine.Sy
     }
 }
 
+const cMaj7 = [0,4,11,14]
+
 const hexagonalLangtonPreseter = (generator: Machine.SystemConfig): Preset => {
     const drawConfig = generateDrawConfig(generator, blackGreyRed, 600, 0)
     return {
         systemConfig: generator,
         drawConfig: drawConfig,
         machines: drawConfig.defaultMachineStart,
-        bpm:120,
+        bpm:80,
         statePlayer: {
             channel: 1,
-            mapping: nameOrderedScale,
+            mapping: cMaj7,
             ignoreZero: false,
             rearticulateOnRepeat: false,
-            rootNote: 40,
+            rootNote: 52,
             duration: 200
         },
         dirPlayer: {
             channel: 2,
-            mapping: nameOrderedScale,
+            mapping: cMaj7,
             ignoreZero: false,
             rearticulateOnRepeat: false,
             rootNote: 64,
@@ -233,14 +235,14 @@ const hexagonalLangtonPreseter = (generator: Machine.SystemConfig): Preset => {
         },
         changePlayer: {
             channel: 3,
-            mapping: [0, 0, 0, 3, 3, 3],
+            mapping: [0,0,0,4,4,4],
             ignoreZero: false,
             rearticulateOnRepeat: false,
-            rootNote: 52,
-            duration: 200,
+            rootNote: 64,
+            duration: 80,
             // debugToConsole: true
         }
     }
 }
 
-export const hexagonalLangtonPreset1 = hexagonalLangtonPreseter(hexagonalLangton(1,[-1,1,-1,1]))
+export const hexagonalLangtonPreset1 = hexagonalLangtonPreseter(hexagonalLangton(1,[-1,-1,1,1]))

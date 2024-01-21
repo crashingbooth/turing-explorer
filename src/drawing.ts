@@ -9,6 +9,8 @@ const triangleHeight = (Math.sqrt(3)/2)
 const hexExtraWidthFactor = Math.sin(2 * Math.PI/6) // 1 col = unit + 2 * hexExtraWidthFactor(unit)
 const hexExtraHeightFactor = Math.cos(2 * Math.PI/6) // 1 row = 2 * hexExtraWidthFactor(unit)
 
+const isSwapping: boolean = true
+
 export type PColor = [number,number,number]
 export type ColorScheme = Array<PColor>
 
@@ -78,13 +80,6 @@ const getUnitSizeForThree =  (systemConfig: Machine.SystemConfig) => {
 }
 
 const getUnitSizeForSix = (systemConfig: Machine.SystemConfig) => {
-    // const offsetYFactor = Math.sin(Math.PI/6)
-	// const offsetXFactor = Math.cos(Math.PI/6) 
-
-    // // const maximizeHeight = (systemConfig.numCols * offsetXFactor) / (systemConfig.numRows * offsetYFactor) < maxWidth / maxHeight
-    // const maximizeHeight = false
-    // const unitSize = maximizeHeight ? maxHeight / (systemConfig.numRows * offsetYFactor): maxWidth / (systemConfig.numCols * offsetXFactor)
-
     return getUnitSizeForSixByHeight(systemConfig)
 }
 
@@ -93,7 +88,7 @@ const getUnitSizeForSixByWidth = (systemConfig: Machine.SystemConfig) => {
 }
 
 const getUnitSizeForSixByHeight = (systemConfig: Machine.SystemConfig) => {
-    return maxHeight/ (systemConfig.numRows * Math.sqrt(3))
+    return (isSwapping ? maxWidth :  maxHeight)/ (systemConfig.numRows * Math.sqrt(3))
 }
 
 
@@ -143,16 +138,27 @@ const drawHexagonalGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) =>
     }
 }
 
-const makeHexagonalCell = (p: p5, x: number, y: number, unit: number, xOffset: number, yOffset: number) => {
-    p.beginShape()
+const invertableVertex = (p: p5, x: number, y: number, invert: boolean) => {
+    const tempX = x
+    x = invert ? y : x
+    y = invert ? tempX : y
     p.vertex(x,y)
-    p.vertex(x + unit, y)
-    p.vertex(x + unit + xOffset, y + yOffset);
-	p.vertex(x + unit, y + yOffset * 2);
-	p.vertex(x, y + yOffset * 2);
-	p.vertex(x - xOffset, y + yOffset)
+    
+}
+
+const makeHexagonalCell = (p: p5, x: number, y: number, unit: number, xOffset: number, yOffset: number) => {
+
+    p.beginShape()
+    invertableVertex(p, x,y, isSwapping)
+    invertableVertex(p, x + unit, y, isSwapping)
+    invertableVertex(p, x + unit + xOffset, y + yOffset, isSwapping);
+	invertableVertex(p, x + unit, y + yOffset * 2, isSwapping);
+	invertableVertex(p, x, y + yOffset * 2, isSwapping);
+	invertableVertex(p, x - xOffset, y + yOffset, isSwapping)
 	p.endShape(p.CLOSE);
 }
+
+
 
 const drawTriangularGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
     const triHeight = drawConfig.unitSize * Math.sqrt(3) / 2
@@ -180,7 +186,6 @@ const drawTriangularGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) =
     }
 }
 
-const isSwapping: boolean = true
 const drawTriangle = (p: p5, [x1, y1, x2,y2,x3,y3]: [number, number,number, number, number, number]) => {
     const args: [number, number,number, number, number, number] = isSwapping ? [y1,x1,y2,x2,y3,x3] : [x1, y1, x2,y2,x3,y3]
     p.triangle(...args)
