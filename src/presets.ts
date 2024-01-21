@@ -153,7 +153,7 @@ export const triangleLangtonPreset1 = (generator: Machine.SystemConfig): Preset 
 
 export const triangleLangtonBasic = triangleLangtonPreset1(triangleLangton(3, [-1, 1]))
 
-// triange langton variants
+// triangal langton variants
 
 export const triangleLangtonPreset2 = (generator: Machine.SystemConfig): Preset => {
     const drawConfig = generateDrawConfig(generator, blackAndWhite(generator.numStates + 2), 100, 500)
@@ -193,7 +193,7 @@ export const triangleLangtonPreset2 = (generator: Machine.SystemConfig): Preset 
 export const triangleLangtonSymmetrical = triangleLangtonPreset2(triangleLangton(1, [-1, 1]))
 
 
-// HEXAGONAL
+// HEXAGONAL LANGTON VARIANTS
 
 export const hexagonalLangton = (numRepeats: number, rule: number[]): Machine.SystemConfig => {
     return {
