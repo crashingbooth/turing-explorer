@@ -1,5 +1,5 @@
 import * as Machine from './Machine';
-import { blackAndWhite, scheme2, blackGreyRed, redToBrown } from './colorSchemes';
+import { blackAndWhite, scheme2, blackGreyRed, redToBrown , whiteBlack} from './colorSchemes';
 import { DrawConfig, generateDrawConfig } from './drawing';
 import { SoundPlayer } from './sound';
 
@@ -77,7 +77,7 @@ export const triSystem2: Machine.SystemConfig = {
 }
 
 export const triSystemPreset = (): Preset => {
-    const drawConfig = generateDrawConfig(triSystem2, blackGreyRed, 60)
+    const drawConfig = generateDrawConfig(triSystem2, blackGreyRed, true, 60)
     return {
         systemConfig: triSystem2,
         drawConfig: drawConfig,
@@ -126,7 +126,7 @@ const run = (n: number): number[] => {
 const nameOrderedScale = [0, 7, 10, 12, 14, 3]
 
 export const triangleLangtonPreset1 = (generator: Machine.SystemConfig): Preset => {
-    const drawConfig = generateDrawConfig(generator, blackAndWhite(generator.numStates + 2), 100, 500)
+    const drawConfig = generateDrawConfig(generator, blackAndWhite(generator.numStates + 2), true, 100, 500)
     return {
         systemConfig: generator,
         drawConfig: drawConfig,
@@ -151,12 +151,11 @@ export const triangleLangtonPreset1 = (generator: Machine.SystemConfig): Preset 
     }
 }
 
-export const triangleLangtonBasic = triangleLangtonPreset1(triangleLangton(3, [-1, 1]))
 
 // triangal langton variants
 
 export const triangleLangtonPreset2 = (generator: Machine.SystemConfig): Preset => {
-    const drawConfig = generateDrawConfig(generator, blackAndWhite(generator.numStates + 2), 100, 500)
+    const drawConfig = generateDrawConfig(generator, blackAndWhite(generator.numStates + 2), true, 100, 500)
     return {
         systemConfig: generator,
         drawConfig: drawConfig,
@@ -190,6 +189,8 @@ export const triangleLangtonPreset2 = (generator: Machine.SystemConfig): Preset 
     }
 }
 
+export const triangleLangtonBasic = triangleLangtonPreset1(triangleLangton(3, [-1, 1]))
+
 export const triangleLangtonSymmetrical = triangleLangtonPreset2(triangleLangton(1, [-1, 1]))
 
 
@@ -211,12 +212,12 @@ export const hexagonalLangton = (numRepeats: number, rule: number[]): Machine.Sy
 const cMaj7 = [0,4,11,14]
 
 const hexagonalLangtonPreseter = (generator: Machine.SystemConfig): Preset => {
-    const drawConfig = generateDrawConfig(generator, blackGreyRed, 600, 0)
+    const drawConfig = generateDrawConfig(generator, blackGreyRed, true, 150, 0)
     return {
         systemConfig: generator,
         drawConfig: drawConfig,
         machines: drawConfig.defaultMachineStart,
-        bpm:80,
+        bpm: 50,
         statePlayer: {
             channel: 1,
             mapping: cMaj7,
@@ -246,3 +247,4 @@ const hexagonalLangtonPreseter = (generator: Machine.SystemConfig): Preset => {
 }
 
 export const hexagonalLangtonPreset1 = hexagonalLangtonPreseter(hexagonalLangton(1,[-1,-1,1,1]))
+

@@ -9,8 +9,6 @@ const triangleHeight = (Math.sqrt(3) / 2)
 const hexExtraWidthFactor = Math.sin(2 * Math.PI / 6) // 1 col = unit + 2 * hexExtraWidthFactor(unit)
 const hexExtraHeightFactor = Math.cos(2 * Math.PI / 6) // 1 row = 2 * hexExtraWidthFactor(unit)
 
-const isSwapping: boolean = true
-
 export type PColor = [number, number, number]
 export type ColorScheme = Array<PColor>
 
@@ -21,11 +19,16 @@ export interface DrawConfig {
     unitSize: number,
     globalXOffset: number,
     globalYOffset: number,
+    swapXY: boolean,
     defaultMachineStart?: [Machine.Machine] // if no machines are included in the preset, start with one in centre
 }
 
 // drawConfig
-export const generateDrawConfig = (systemConfig: Machine.SystemConfig, colorScheme: ColorScheme, xOffset: number = 0, yOffset: number = 0): DrawConfig => {
+export const generateDrawConfig = (systemConfig: Machine.SystemConfig,
+    colorScheme: ColorScheme,
+    swapXY: boolean = false,
+    xOffset: number = 0,
+    yOffset: number = 0): DrawConfig => {
 
     let unitSize: number
     if (systemConfig.sides === Machine.Sides.Four) {
@@ -33,7 +36,7 @@ export const generateDrawConfig = (systemConfig: Machine.SystemConfig, colorSche
     } else if (systemConfig.sides === Machine.Sides.Three) {
         unitSize = getUnitSizeForThree(systemConfig)
     } else if (systemConfig.sides === Machine.Sides.Six) {
-        unitSize = getUnitSizeForSix(systemConfig)
+        unitSize = getUnitSizeForSix(systemConfig, swapXY)
     }
 
     let yUnitSize = systemConfig.sides === Machine.Sides.Three ? unitSize * triangleHeight : unitSize
@@ -47,9 +50,6 @@ export const generateDrawConfig = (systemConfig: Machine.SystemConfig, colorSche
         canvasSize = [systemConfig.numCols * unitSize * 2, systemConfig.numRows * unitSize * triangleHeight * 2]
     }
 
-
-
-
     return {
         colorScheme: colorScheme,
         canvasX: canvasSize[0],
@@ -57,6 +57,7 @@ export const generateDrawConfig = (systemConfig: Machine.SystemConfig, colorSche
         unitSize: unitSize,
         globalXOffset: xOffset,
         globalYOffset: yOffset,
+        swapXY: swapXY,
         defaultMachineStart: getDefaultMachineStartPoint(systemConfig)
     }
 }
@@ -79,11 +80,11 @@ const getUnitSizeForThree = (systemConfig: Machine.SystemConfig) => {
     return unitSize
 }
 
-const getUnitSizeForSix = (systemConfig: Machine.SystemConfig) => {
-    return getUnitSizeForSixByHeight(systemConfig)
+const getUnitSizeForSix = (systemConfig: Machine.SystemConfig, isSwapping: boolean) => {
+    return getUnitSizeForSixByHeight(systemConfig, isSwapping)
 }
 
-const getUnitSizeForSixByHeight = (systemConfig: Machine.SystemConfig) => {
+const getUnitSizeForSixByHeight = (systemConfig: Machine.SystemConfig, isSwapping: boolean) => {
     return (isSwapping ? maxWidth : maxHeight) / (systemConfig.numRows * Math.sqrt(3))
 }
 
@@ -96,9 +97,9 @@ const getDefaultMachineStartPoint = (systemConfig: Machine.SystemConfig): [Machi
 
 export const drawGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
     p.background(drawConfig.colorScheme[0])
-    // p.noStroke()
+    p.noStroke()
     // p.stroke(drawConfig.colorScheme[0])
-    p.strokeWeight(0.3)
+    // p.strokeWeight(0.3)
 
     if (grid.system.sides === Machine.Sides.Three) {
         drawTriangularGrid(p, grid, drawConfig)
@@ -134,7 +135,8 @@ const drawHexagonalGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) =>
                 row * (offsetY * 2) + yOff + drawConfig.globalYOffset,
                 unit,
                 offsetX,
-                offsetY
+                offsetY,
+                drawConfig.swapXY
             )
         }
     }
@@ -146,7 +148,7 @@ const invertableVertex = (p: p5, x: number, y: number, invert: boolean) => {
     p.vertex(newX, newY)
 }
 
-const makeHexagonalCell = (p: p5, x: number, y: number, unit: number, xOffset: number, yOffset: number) => {
+const makeHexagonalCell = (p: p5, x: number, y: number, unit: number, xOffset: number, yOffset: number, isSwapping: boolean) => {
 
     p.beginShape()
     invertableVertex(p, x, y, isSwapping)
@@ -184,7 +186,7 @@ const drawTriangularGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) =
     }
 }
 
-const drawTriangle = (p: p5, [x1, y1, x2, y2, x3, y3]: [number, number, number, number, number, number]) => {
+const drawTriangle = (p: p5, [x1, y1, x2, y2, x3, y3]: [number, number, number, number, number, number], isSwapping: boolean) => {
     const args: [number, number, number, number, number, number] = isSwapping ? [y1, x1, y2, x2, y3, x3] : [x1, y1, x2, y2, x3, y3]
     p.triangle(...args)
 }
@@ -192,13 +194,13 @@ const drawTriangle = (p: p5, [x1, y1, x2, y2, x3, y3]: [number, number, number, 
 const drawDownTriangle = (p: p5, x: number, y: number, unit: number, triHeight: number, drawConfig: DrawConfig) => {
     x = x + drawConfig.globalXOffset
     y = y + drawConfig.globalYOffset
-    drawTriangle(p, [x, y, x + unit, y, x + (unit / 2), y + triHeight])
+    drawTriangle(p, [x, y, x + unit, y, x + (unit / 2), y + triHeight], drawConfig.swapXY)
 }
 
 const drawUpTriangle = (p: p5, x: number, y: number, unit: number, triHeight: number, drawConfig: DrawConfig) => {
     x = x + drawConfig.globalXOffset
     y = y + drawConfig.globalYOffset
-    drawTriangle(p, [x, y, x + (unit / 2), y + triHeight, x - (unit / 2), y + triHeight])
+    drawTriangle(p, [x, y, x + (unit / 2), y + triHeight, x - (unit / 2), y + triHeight], drawConfig.swapXY)
 }
 
 
