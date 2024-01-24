@@ -31,7 +31,7 @@ export const generateDrawConfig = (systemConfig: Machine.SystemConfig,
     yOffset: number = 0): DrawConfig => {
 
     let unitSize: number
-    if (systemConfig.sides === Machine.Sides.Four) {
+    if (systemConfig.sides === Machine.Sides.Four || systemConfig.sides === Machine.Sides.Eight) {
         unitSize = getUnitSizeForFour(systemConfig)
     } else if (systemConfig.sides === Machine.Sides.Three) {
         unitSize = getUnitSizeForThree(systemConfig)
@@ -42,7 +42,7 @@ export const generateDrawConfig = (systemConfig: Machine.SystemConfig,
     let yUnitSize = systemConfig.sides === Machine.Sides.Three ? unitSize * triangleHeight : unitSize
 
     let canvasSize: [number, number]
-    if (systemConfig.sides === Machine.Sides.Four) {
+    if (systemConfig.sides === Machine.Sides.Four || systemConfig.sides === Machine.Sides.Eight) {
         canvasSize = [systemConfig.numCols * unitSize, systemConfig.numRows * unitSize]
     } else if (systemConfig.sides === Machine.Sides.Three) {
         canvasSize = [systemConfig.numCols * unitSize, systemConfig.numRows * yUnitSize]
@@ -107,6 +107,8 @@ export const drawGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
         drawSquareGrid(p, grid, drawConfig)
     } else if ((grid.system.sides === Machine.Sides.Six)) {
         drawHexagonalGrid(p, grid, drawConfig)
+    }  else if ((grid.system.sides === Machine.Sides.Eight)) {
+        drawSquareGrid(p, grid, drawConfig)
     }
 }
 

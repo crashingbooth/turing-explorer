@@ -10,7 +10,8 @@ export type Dir = number
 export enum Sides {
     Four,
     Three,
-    Six
+    Six,
+    Eight
 }
 
 export type StateDir = {
@@ -31,7 +32,7 @@ export interface SystemConfig {
     numStates: number
     numDirs: number
     sides: Sides
-    colorScheme? : ColorScheme 
+    colorScheme?: ColorScheme
     rule: Rule
 }
 
@@ -66,7 +67,7 @@ export const normalizeRuleOutput = (stateDir: StateDir, config: SystemConfig) =>
 export interface Machine {
     point: Point
     dir: Dir
-    lastChange?: Dir 
+    lastChange?: Dir
 }
 
 export interface Grid {
@@ -85,6 +86,8 @@ export const movePoint = (sides: Sides, point: Point, dir: Dir): Point => {
         return movePointFor4(point, dir, 4)
     } else if (sides === Sides.Six) {
         return movePointFor6(point, dir, 6)
+    } else if (sides === Sides.Eight) {
+        return movePointFor8(point, dir, 8) 
     }
 }
 
@@ -110,16 +113,16 @@ const movePointFor4 = (point: Point, dir: Dir, numDirs: number): Point => {
 const movePointFor3 = (point: Point, dir: Dir, numDirs: number): Point => {
     const normalizedDirection = dir < 0 ? dir += numDirs : dir % numDirs
     const isDown = point.x + point.y % 2 === 0
-    
+
 
     if (normalizedDirection == 0) {
-        return { x: point.x, y: point.y - 1}
+        return { x: point.x, y: point.y - 1 }
     } else if (normalizedDirection == 1) {
         return { x: point.x + 1, y: point.y }
     } else if (normalizedDirection == 2) {
         return { x: point.x + 1, y: point.y }
     } else if (normalizedDirection == 3) {
-        return { x: point.x , y: point.y + 1}
+        return { x: point.x, y: point.y + 1 }
     } else if (normalizedDirection == 4) {
         return { x: point.x - 1, y: point.y }
     } else if (normalizedDirection == 5) {
@@ -132,21 +135,44 @@ const movePointFor3 = (point: Point, dir: Dir, numDirs: number): Point => {
 const movePointFor6 = (point: Point, dir: Dir, numDirs: number = 6): Point => {
     const normalizedDirection = dir < 0 ? dir += numDirs : dir % numDirs
     console.log(`normalDir ${normalizedDirection}`);
-    
+
     let oddCol = point.x % 2 !== 0;
 
     if (normalizedDirection == 0) {
-        return { x: point.x, y: point.y - 1}
+        return { x: point.x, y: point.y - 1 }
     } else if (normalizedDirection == 1) {
         return { x: point.x + 1, y: point.y + (oddCol ? 0 : -1) }
     } else if (normalizedDirection == 2) {
-        return { x: point.x + 1, y: point.y + (oddCol ? 1 : 0 )}
+        return { x: point.x + 1, y: point.y + (oddCol ? 1 : 0) }
     } else if (normalizedDirection == 3) {
-        return { x: point.x , y: point.y + 1}
+        return { x: point.x, y: point.y + 1 }
     } else if (normalizedDirection == 4) {
         return { x: point.x - 1, y: point.y + (oddCol ? 1 : 0) }
     } else if (normalizedDirection == 5) {
-        return { x: point.x - 1, y: point.y - (oddCol ? 0 : 1 )}
+        return { x: point.x - 1, y: point.y - (oddCol ? 0 : 1) }
+    } else {
+        return { ...point }
+    }
+}
+
+const movePointFor8 = (point: Point, dir: Dir, numDirs: number): Point => {
+    const normalizedDirection = dir < 0 ? dir += numDirs : dir % numDirs
+    if (normalizedDirection == 0) {
+        return { ...point, y: point.y - 1 }
+    } else if (normalizedDirection == 1) {
+        return { x: point.x + 1, y: point.y - 1 }
+    } else if (normalizedDirection == 2) {
+        return { ...point, x: point.x + 1 }
+    } else if (normalizedDirection == 3) {
+        return { x: point.x + 1, y: point.y + 1 }
+    } else if (normalizedDirection == 4) {
+        return { ...point, y: point.y + 1 }
+    } else if (normalizedDirection == 5) {
+        return { x: point.x - 1, y: point.y + 1 }
+    } else if (normalizedDirection == 6) {
+        return { ...point, x: point.x - 1 }
+    } else if (normalizedDirection == 7) {
+        return { x: point.x - 1, y: point.y - 1 }
     } else {
         return { ...point }
     }
@@ -166,7 +192,7 @@ export const applyRule = (grid: Grid): Grid => {
         // move machine in its direction, get new Point
         const newPoint = movePoint(grid.system.sides, machine.point, machine.dir)
         // console.log(`apply rule: oldPoint ${debugPoint(machine.point)}  newPoint ${debugPoint(newPoint)}`);
-        
+
         const normalizedPoint = normalizePoint(newPoint, grid.system)
         // get new StateDir
         const newStateDir = {
@@ -182,7 +208,7 @@ export const applyRule = (grid: Grid): Grid => {
         // update space
         grid.space[normalizedPoint.y][normalizedPoint.x] = normalizedRuleOutput.state
         // console.log(`applyRule, point: ${debugPoint(normalizedPoint)}, newState: ${normalizedRuleOutput.state}`);
-        
+
         // update machine
         grid.machines[i] = { point: { ...normalizedPoint }, dir: newDirection, lastChange: normalizeSingle(ruleOutput.dir, grid.system.numDirs) }
     })

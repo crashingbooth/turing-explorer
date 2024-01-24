@@ -248,3 +248,55 @@ const hexagonalLangtonPreseter = (generator: Machine.SystemConfig): Preset => {
 
 export const hexagonalLangtonPreset1 = hexagonalLangtonPreseter(hexagonalLangton(1,[-1,-1,1,1]))
 
+// 8-SIDED LANGTON VARIANTS
+
+export const eightWayLangton = (numRepeats: number, rule: number[]): Machine.SystemConfig => {
+    return {
+        numDirs: 8,
+        numCols: 56,
+        numRows: 48,
+        numStates: rule.length * numRepeats,
+        sides: Machine.Sides.Eight,
+        rule: Machine.langtonsAntFactory(
+            Array.from({ length: numRepeats }, () => rule).flat()
+        )
+    }
+}
+
+const eightWayLangtonPreseter = (generator: Machine.SystemConfig): Preset => {
+    const drawConfig = generateDrawConfig(generator, blackGreyRed, true, 150, 0)
+    return {
+        systemConfig: generator,
+        drawConfig: drawConfig,
+        machines: drawConfig.defaultMachineStart,
+        bpm: 50,
+        statePlayer: {
+            channel: 1,
+            mapping: cMaj7,
+            ignoreZero: false,
+            rearticulateOnRepeat: false,
+            rootNote: 52,
+            duration: 200
+        },
+        dirPlayer: {
+            channel: 2,
+            mapping: cMaj7,
+            ignoreZero: false,
+            rearticulateOnRepeat: false,
+            rootNote: 64,
+            duration: 160
+        },
+        changePlayer: {
+            channel: 3,
+            mapping: [0,0,0,4,4,4],
+            ignoreZero: false,
+            rearticulateOnRepeat: false,
+            rootNote: 64,
+            duration: 80,
+            // debugToConsole: true
+        }
+    }
+}
+
+export const eightWayLangtonPreset1 = eightWayLangtonPreseter(eightWayLangton(1,[-1,1]))
+
