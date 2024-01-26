@@ -30,7 +30,12 @@ export const sketch = (p: p5) => {
         if (frame < delay) { return }
         drawing.drawGrid(p, grid, drawingConfig)
         grid = M.applyRule(grid)
-        articulate(grid)
+        // articulate(grid)
+        console.log(`step: ${frame} `);
+        if (frame === 10200) {
+            p.frameRate(bpmToFrameRate(180))
+        }
+        
     }
 }
 

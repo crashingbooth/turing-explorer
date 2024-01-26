@@ -43,6 +43,13 @@ export const whiteBlack: ColorScheme = [
 ]
 
 
+export const whiteAndOther: ColorScheme = [
+    [255,255,255],
+    [216, 87, 42]
+]
+
+
+
 export const blackAndWhite = (numStates: number): ColorScheme => {
     const interval = 255 / numStates
     return Array.from({ length: numStates }, (_, index) => {

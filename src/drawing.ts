@@ -116,7 +116,7 @@ const drawSquareGrid = (p: p5, grid: Machine.Grid, drawConfig: DrawConfig) => {
     for (let row = 0; row < grid.system.numRows; row++) {
         for (let col = 0; col < grid.system.numCols; col++) {
             const state = grid.space[row][col]
-            p.fill(Math.floor(state / grid.system.numStates * 255))
+            p.fill(...drawConfig.colorScheme[state % drawConfig.colorScheme.length])
             p.circle(col * drawConfig.unitSize + drawConfig.unitSize / 2 + drawConfig.globalXOffset, row * drawConfig.unitSize + drawConfig.unitSize / 2 + drawConfig.globalYOffset, drawConfig.unitSize)
         }
     }

@@ -1,5 +1,5 @@
 import * as Machine from './Machine';
-import { blackAndWhite, scheme2, blackGreyRed, redToBrown , whiteBlack} from './colorSchemes';
+import { blackAndWhite, scheme2, blackGreyRed, redToBrown , whiteBlack, whiteAndOther} from './colorSchemes';
 import { DrawConfig, generateDrawConfig } from './drawing';
 import { SoundPlayer } from './sound';
 
@@ -253,8 +253,8 @@ export const hexagonalLangtonPreset1 = hexagonalLangtonPreseter(hexagonalLangton
 export const eightWayLangton = (numRepeats: number, rule: number[]): Machine.SystemConfig => {
     return {
         numDirs: 8,
-        numCols: 56,
-        numRows: 48,
+        numCols: 100,
+        numRows: 100,
         numStates: rule.length * numRepeats,
         sides: Machine.Sides.Eight,
         rule: Machine.langtonsAntFactory(
@@ -264,12 +264,12 @@ export const eightWayLangton = (numRepeats: number, rule: number[]): Machine.Sys
 }
 
 const eightWayLangtonPreseter = (generator: Machine.SystemConfig): Preset => {
-    const drawConfig = generateDrawConfig(generator, blackGreyRed, true, 150, 0)
+    const drawConfig = generateDrawConfig(generator, whiteAndOther, false, -100, -200)
     return {
         systemConfig: generator,
         drawConfig: drawConfig,
         machines: drawConfig.defaultMachineStart,
-        bpm: 50,
+        bpm: 1000,
         statePlayer: {
             channel: 1,
             mapping: cMaj7,
@@ -298,5 +298,7 @@ const eightWayLangtonPreseter = (generator: Machine.SystemConfig): Preset => {
     }
 }
 
-export const eightWayLangtonPreset1 = eightWayLangtonPreseter(eightWayLangton(1,[-1,1]))
+export const eightWayLangtonPreset1 = eightWayLangtonPreseter(eightWayLangton(1,[-2,2]))
+
+
 
