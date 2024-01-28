@@ -1,8 +1,7 @@
 import * as p5 from 'p5';
 import * as M from './Machine';
 import * as drawing from './drawing'
-import * as colorSchemes from './colorSchemes'
-import { Preset, hexagonalLangtonPreset1, triangleLangtonSymmetrical,eightWayLangtonPreset1 }  from './presets'
+import * as presets  from './presets'
 import { SoundPlayer, articulate, addSoundPlayersFromPreset, bpmToFrameRate } from './sound'; 
 import { webMidiInit } from './webMidiInit';
 
@@ -11,7 +10,7 @@ export const sketch = (p: p5) => {
     let grid: M.Grid
     let frame = 0
     let drawingConfig: drawing.DrawConfig
-    let preset: Preset = eightWayLangtonPreset1
+    let preset: presets.Preset = presets.eightWayLangtonPreset1
 
     p.setup = () => {
         drawingConfig = preset.drawConfig
@@ -30,12 +29,8 @@ export const sketch = (p: p5) => {
         if (frame < delay) { return }
         drawing.drawGrid(p, grid, drawingConfig)
         grid = M.applyRule(grid)
-        // articulate(grid)
-        console.log(`step: ${frame} `);
-        if (frame === 10200) {
-            p.frameRate(bpmToFrameRate(180))
-        }
-        
+        articulate(grid)
+        console.log(`step: ${frame} `)
     }
 }
 

@@ -1,5 +1,5 @@
 import * as Machine from './Machine';
-import { blackAndWhite, scheme2, blackGreyRed, redToBrown , whiteBlack, whiteAndOther} from './colorSchemes';
+import * as colourScheme from './colorSchemes';
 import { DrawConfig, generateDrawConfig } from './drawing';
 import { SoundPlayer } from './sound';
 
@@ -77,7 +77,7 @@ export const triSystem2: Machine.SystemConfig = {
 }
 
 export const triSystemPreset = (): Preset => {
-    const drawConfig = generateDrawConfig(triSystem2, blackGreyRed, true, 60)
+    const drawConfig = generateDrawConfig(triSystem2, colourScheme.blackGreyRed, true, 60)
     return {
         systemConfig: triSystem2,
         drawConfig: drawConfig,
@@ -126,7 +126,7 @@ const run = (n: number): number[] => {
 const nameOrderedScale = [0, 7, 10, 12, 14, 3]
 
 export const triangleLangtonPreset1 = (generator: Machine.SystemConfig): Preset => {
-    const drawConfig = generateDrawConfig(generator, blackAndWhite(generator.numStates + 2), true, 100, 500)
+    const drawConfig = generateDrawConfig(generator, colourScheme.blackAndWhite(generator.numStates + 2), true, 100, 500)
     return {
         systemConfig: generator,
         drawConfig: drawConfig,
@@ -155,7 +155,7 @@ export const triangleLangtonPreset1 = (generator: Machine.SystemConfig): Preset 
 // triangal langton variants
 
 export const triangleLangtonPreset2 = (generator: Machine.SystemConfig): Preset => {
-    const drawConfig = generateDrawConfig(generator, blackAndWhite(generator.numStates + 2), true, 100, 500)
+    const drawConfig = generateDrawConfig(generator, colourScheme.blackAndWhite(generator.numStates + 2), true, 100, 500)
     return {
         systemConfig: generator,
         drawConfig: drawConfig,
@@ -212,7 +212,7 @@ export const hexagonalLangton = (numRepeats: number, rule: number[]): Machine.Sy
 const cMaj7 = [0,4,11,14]
 
 const hexagonalLangtonPreseter = (generator: Machine.SystemConfig): Preset => {
-    const drawConfig = generateDrawConfig(generator, blackGreyRed, true, 150, 0)
+    const drawConfig = generateDrawConfig(generator, colourScheme.blackGreyRed, true, 150, 0)
     return {
         systemConfig: generator,
         drawConfig: drawConfig,
@@ -264,7 +264,7 @@ export const eightWayLangton = (numRepeats: number, rule: number[]): Machine.Sys
 }
 
 const eightWayLangtonPreseter = (generator: Machine.SystemConfig): Preset => {
-    const drawConfig = generateDrawConfig(generator, whiteAndOther, false, -100, -200)
+    const drawConfig = generateDrawConfig(generator, colourScheme.col4, false, -100, -200)
     return {
         systemConfig: generator,
         drawConfig: drawConfig,
@@ -298,7 +298,7 @@ const eightWayLangtonPreseter = (generator: Machine.SystemConfig): Preset => {
     }
 }
 
-export const eightWayLangtonPreset1 = eightWayLangtonPreseter(eightWayLangton(1,[-2,2]))
+export const eightWayLangtonPreset1 = eightWayLangtonPreseter(eightWayLangton(1,[-2,2,2,-2,-2,2,2-2]))
 
 
 
